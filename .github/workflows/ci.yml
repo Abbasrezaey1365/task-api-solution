@@ -22,24 +22,43 @@ jobs:
       - name: Install dependencies
         run: composer install --no-interaction --prefer-dist --no-progress
 
-      - name: Prepare environment
+      - name: Prepare environment (use testing env)
         run: |
-          cp .env.example .env
+          if [ -f .env.testing ]; then
+            cp .env.testing .env
+          else
+            cp .env.example .env
+          fi
+
           php artisan key:generate
           php artisan config:clear
 
-      - name: Use SQLite for CI
+      - name: Prepare SQLite database file
         run: |
+          mkdir -p database
           touch database/database.sqlite
 
       - name: Run migrations
         env:
+          APP_ENV: testing
           DB_CONNECTION: sqlite
           DB_DATABASE: database/database.sqlite
         run: php artisan migrate --force
 
+      - name: Debug test discovery (prints all tests)
+        env:
+          APP_ENV: testing
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
+        run: |
+          echo "=== LIST TEST FILES ==="
+          find tests -type f -name "*Test.php" -print
+          echo "=== PHPUNIT DISCOVERED TESTS ==="
+          php artisan test --list-tests
+
       - name: Run tests with coverage gate
         env:
+          APP_ENV: testing
           DB_CONNECTION: sqlite
           DB_DATABASE: database/database.sqlite
         run: php artisan test --coverage --min=70
