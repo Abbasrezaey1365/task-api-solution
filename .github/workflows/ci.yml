@@ -2,45 +2,39 @@ name: CI
 
 on:
   push:
+    branches: [ main ]
   pull_request:
 
 jobs:
   tests:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
+      - uses: shivammathur/setup-php@v2
         with:
           php-version: "8.2"
           extensions: mbstring, sqlite3
           coverage: pcov
 
-      - name: Install dependencies
-        run: composer install --no-interaction --prefer-dist --no-progress
+      - run: composer install --no-interaction --prefer-dist --no-progress
 
-      - name: Prepare testing environment
+      - name: Prepare env
         run: |
           cp .env.example .env
-          cp .env.example .env.testing
           php artisan key:generate
-          php artisan key:generate --env=testing
           php artisan config:clear
           mkdir -p database
           touch database/database.sqlite
 
-      - name: Run migrations (testing)
+      - name: Migrate
         env:
           DB_CONNECTION: sqlite
           DB_DATABASE: database/database.sqlite
-        run: php artisan migrate --env=testing --force
+        run: php artisan migrate --force
 
-      - name: Run tests with coverage gate (testing)
+      - name: Test + coverage
         env:
           DB_CONNECTION: sqlite
           DB_DATABASE: database/database.sqlite
-  run: php artisan test --env=testing --coverage --min=60
-
+        run: php artisan test --coverage --min=70
