@@ -28,5 +28,18 @@ jobs:
           php artisan key:generate
           php artisan config:clear
 
+      - name: Use SQLite for CI
+        run: |
+          touch database/database.sqlite
+
+      - name: Run migrations
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
+        run: php artisan migrate --force
+
       - name: Run tests with coverage gate
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: database/database.sqlite
         run: php artisan test --coverage --min=70
