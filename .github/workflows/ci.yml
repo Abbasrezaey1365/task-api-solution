@@ -16,11 +16,11 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: "8.2"
-          extensions: mbstring, sqlite, pcov
+          extensions: mbstring, sqlite3
           coverage: pcov
 
       - name: Install dependencies
-        run: composer install --no-interaction --prefer-dist
+        run: composer install --no-interaction --prefer-dist --no-progress
 
       - name: Prepare environment
         run: |
@@ -28,13 +28,5 @@ jobs:
           php artisan key:generate
           php artisan config:clear
 
-      # Use sqlite memory for CI so no MySQL service is needed
       - name: Run tests with coverage gate
-        env:
-          APP_ENV: testing
-          DB_CONNECTION: sqlite
-          DB_DATABASE: ":memory:"
-          CACHE_STORE: array
-          QUEUE_CONNECTION: sync
-          MAIL_MAILER: array
         run: php artisan test --coverage --min=70

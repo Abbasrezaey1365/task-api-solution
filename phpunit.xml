@@ -6,40 +6,39 @@
 >
     <testsuites>
         <testsuite name="Unit">
-            <directory>tests/Unit</directory>
+            <directory suffix="Test.php">tests/Unit</directory>
         </testsuite>
+
         <testsuite name="Feature">
-            <directory>tests/Feature</directory>
+            <directory suffix="Test.php">tests/Feature</directory>
         </testsuite>
     </testsuites>
-<source>
-  <include>
-    <directory>app</directory>
-  </include>
 
-  <exclude>
-    <directory>app/Providers</directory>
-    <directory>app/Console</directory>
-    <directory>app/Exceptions</directory>
-    <directory>app/Http/Middleware</directory>
-  </exclude>
-</source>
+    <!-- Coverage config (does NOT affect which tests run) -->
+    <coverage processUncoveredFiles="true">
+        <include>
+            <directory suffix=".php">app</directory>
+        </include>
 
-<php>
-    <env name="APP_ENV" value="testing"/>
-    <env name="APP_MAINTENANCE_DRIVER" value="file"/>
-    <env name="BCRYPT_ROUNDS" value="4"/>
+        <!-- Optional excludes if you want (keep minimal, don’t exclude your actual logic) -->
+        <exclude>
+            <directory>app/Providers</directory>
+        </exclude>
+    </coverage>
 
-    <env name="CACHE_STORE" value="array"/>
-    <env name="QUEUE_CONNECTION" value="sync"/>
-    <env name="SESSION_DRIVER" value="array"/>
-    <env name="MAIL_MAILER" value="array"/>
+    <php>
+        <env name="APP_ENV" value="testing"/>
+        <env name="APP_DEBUG" value="true"/>
+        <env name="CACHE_STORE" value="array"/>
+        <env name="QUEUE_CONNECTION" value="sync"/>
+        <env name="MAIL_MAILER" value="array"/>
+        <env name="SESSION_DRIVER" value="array"/>
+        <env name="PULSE_ENABLED" value="false"/>
+        <env name="TELESCOPE_ENABLED" value="false"/>
+        <env name="NIGHTWATCH_ENABLED" value="false"/>
 
-    <env name="DB_CONNECTION" value="sqlite"/>
-    <env name="DB_DATABASE" value=":memory:"/>
-
-    <env name="PULSE_ENABLED" value="false"/>
-    <env name="TELESCOPE_ENABLED" value="false"/>
-    <env name="NIGHTWATCH_ENABLED" value="false"/>
-</php>
+        <!-- IMPORTANT: make tests DB stable in CI -->
+        <env name="DB_CONNECTION" value="sqlite"/>
+        <env name="DB_DATABASE" value=":memory:"/>
+    </php>
 </phpunit>
