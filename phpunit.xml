@@ -14,17 +14,16 @@
         </testsuite>
     </testsuites>
 
-    <!-- Coverage config (does NOT affect which tests run) -->
-    <coverage processUncoveredFiles="true">
+    <coverage processUncoveredFiles="true"/>
+
+    <source>
         <include>
             <directory suffix=".php">app</directory>
         </include>
-
-        <!-- Optional excludes if you want (keep minimal, don’t exclude your actual logic) -->
         <exclude>
             <directory>app/Providers</directory>
         </exclude>
-    </coverage>
+    </source>
 
     <php>
         <env name="APP_ENV" value="testing"/>
@@ -37,7 +36,6 @@
         <env name="TELESCOPE_ENABLED" value="false"/>
         <env name="NIGHTWATCH_ENABLED" value="false"/>
 
-        <!-- IMPORTANT: make tests DB stable in CI -->
         <env name="DB_CONNECTION" value="sqlite"/>
         <env name="DB_DATABASE" value=":memory:"/>
     </php>
