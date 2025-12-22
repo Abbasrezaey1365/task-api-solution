@@ -21,7 +21,6 @@ class AuthController extends Controller
         $user = User::query()->create([
             'name' => $data['name'],
             'email' => $data['email'],
-            // even though you have 'password' => 'hashed' cast, Hash::make is explicit & safe
             'password' => Hash::make($data['password']),
         ]);
 

@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 
 class Authenticate extends Middleware
 {
-    // IMPORTANT: must be public because your unit test calls it directly
     public function redirectTo(Request $request): ?string
     {
         if ($request->expectsJson()) {

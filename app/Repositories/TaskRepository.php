@@ -46,7 +46,7 @@ class TaskRepository
     {
         return Task::query()->create([
             'project_id' => $projectId,
-            'user_id' => $data['user_id'] ?? null,          // service sets this
+            'user_id' => $data['user_id'] ?? null,         
             'assignee_id' => $data['assignee_id'] ?? null,
             'assigned_user_id' => $data['assigned_user_id'] ?? null,
             'title' => $data['title'],

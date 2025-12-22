@@ -14,9 +14,7 @@ class TaskController extends Controller
         private readonly TaskService $service
     ) {}
 
-    // Works for:
-    // - GET /api/tasks?project_id=123
-    // - GET /api/projects/{project}/tasks
+
     public function index(Request $request, ?int $project = null): JsonResponse
     {
         $userId = (int) $request->user()->id;
@@ -42,9 +40,6 @@ class TaskController extends Controller
         return response()->json($page);
     }
 
-    // Works for:
-    // - POST /api/tasks  (must include project_id)
-    // - POST /api/projects/{project}/tasks
     public function store(Request $request, ?int $project = null): JsonResponse
     {
         $userId = (int) $request->user()->id;
@@ -58,10 +53,8 @@ class TaskController extends Controller
             'status' => ['sometimes', Rule::in(['todo', 'doing', 'done'])],
             'due_date' => ['nullable', 'date'],
 
-            // FK is OK here
             'assignee_id' => ['nullable', 'integer', 'exists:users,id'],
 
-            // IMPORTANT: must NOT be exists (tests allow invalid id like 999999)
             'assigned_user_id' => ['nullable', 'integer'],
         ]);
 
@@ -97,11 +90,7 @@ class TaskController extends Controller
             'description' => ['sometimes', 'nullable', 'string'],
             'status' => ['sometimes', Rule::in(['todo', 'doing', 'done'])],
             'due_date' => ['sometimes', 'nullable', 'date'],
-
-            // FK is OK here
             'assignee_id' => ['sometimes', 'nullable', 'integer', 'exists:users,id'],
-
-            // IMPORTANT: must NOT be exists
             'assigned_user_id' => ['sometimes', 'nullable', 'integer'],
         ]);
 

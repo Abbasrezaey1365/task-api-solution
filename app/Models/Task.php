@@ -30,19 +30,16 @@ class Task extends Model
         return $this->belongsTo(Project::class);
     }
 
-    // owner/creator
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
     }
 
-    // assignee via FK
     public function assignee(): BelongsTo
     {
         return $this->belongsTo(User::class, 'assignee_id');
     }
 
-    // assignee via non-FK column (tests sometimes use this)
     public function assignedUser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'assigned_user_id');
