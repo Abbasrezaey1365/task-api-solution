@@ -15,22 +15,26 @@ Built with **Laravel (PHP 8.2+)**, **Sanctum** for API authentication, layered a
 
 ## Live Demo
 
-### Frontend (Angular)
-- **https://journal-index.org/login**
-
-You can **register** using email + password, or use demo credentials:
-
-- **Email:** `demo@email.com`  
-- **Password:** `12345`
-
 ### API (Laravel)
 - **https://api.journal-index.org**
 
-Health check example:
-- `GET /api/health` → `{ "ok": true }` *(if you have it)*
+Quick check:
+- `GET /api/health` → `{ "ok": true }`
+
+> The API is the core deliverable for this assessment.
+
+### Optional Frontend (Angular)
+- **https://journal-index.org/login**
+
+The frontend is **not part of the original assessment requirements**.  
+It is provided only to **visualize the features** and **test the API faster**.
+
+You can register using email + password, or use demo credentials:
+
+- **Email:** `demo@email.com`
+- **Password:** `12345`
 
 > Demo data may be reset at any time.
-
 ---
 
 ## Tech Stack
