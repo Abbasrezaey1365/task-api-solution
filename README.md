@@ -1,6 +1,6 @@
 # Collaborative Task Management API (Laravel)
 
-Senior PHP Backend Developer – Coding Assessment solution.
+**Senior PHP Backend Developer – Coding Assessment solution.**
 
 A REST API for collaborative task management:
 - Users (Auth)
@@ -9,7 +9,9 @@ A REST API for collaborative task management:
 - Comments (CRUD per task)
 - Notifications (triggered on task changes)
 
-Built with **Laravel (PHP 8.2+)**, **Sanctum** for API authentication, layered architecture (Controllers → Services → Repositories), caching for task listings, standardized API responses, and automated tests.
+Built with **Laravel (PHP 8.2+)**, **Sanctum** for API authentication, layered architecture (**Controllers → Services → Repositories**), caching for task listings, standardized API responses, and automated tests.
+
+> **Assessment context:** This repository contains my solution for the **Senior PHP Backend Developer – Coding Assessment**.
 
 ---
 
@@ -18,7 +20,7 @@ Built with **Laravel (PHP 8.2+)**, **Sanctum** for API authentication, layered a
 ### API (Laravel)
 - **https://api.journal-index.org**
 
-Quick check:
+Health check:
 - `GET /api/health` → `{ "ok": true }`
 
 > The API is the core deliverable for this assessment.
@@ -35,6 +37,7 @@ You can register using email + password, or use demo credentials:
 - **Password:** `123456789`
 
 > Demo data may be reset at any time.
+
 ---
 
 ## Tech Stack
@@ -45,6 +48,19 @@ You can register using email + password, or use demo credentials:
 - SQLite (tests) / MySQL (local dev)
 - Queue: `sync` in tests, configurable for async workers
 - GitHub Actions CI (tests + coverage gate)
+
+---
+
+## Quality & Testing
+
+-  **Layered architecture:** Controllers → Services → Repositories
+-  **Design patterns used:** Repository + Observer (notifications on task changes)
+-  **Caching:** task list endpoints (reduce repeated DB work)
+-  **Rate limiting:** enabled for sensitive endpoints (auth)
+-  **Standardized responses:** consistent `success/error/message/data` structure
+-  **Automated tests:** unit + feature tests
+-  **Coverage:** **above the required 70%** (coverage gate enforced via CI)  
+  *(If you confirmed 80%+, replace this line with “80%+ overall”.)*
 
 ---
 
