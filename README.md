@@ -1,71 +1,86 @@
-# Collaborative Task Management API (Laravel)
+# Task Management API (Laravel)
 
-**Senior PHP Backend Developer – Coding Assessment solution.**
+Hi, I finished the coding assessment.
 
-A REST API for collaborative task management:
-- Users (Auth)
-- Projects (owned by user)
-- Tasks (CRUD + filtering + pagination)
-- Comments (CRUD per task)
-- Notifications (triggered on task changes)
+This is a REST API for:
+- register / login
+- projects
+- tasks
+- comments
+- notifications
 
-Built with **Laravel (PHP 8.2+)**, **Sanctum** for API authentication, layered architecture (**Controllers → Services → Repositories**), caching for task listings, standardized API responses, and automated tests.
-
-> **Assessment context:** This repository contains my solution for the **Senior PHP Backend Developer – Coding Assessment**.
+I used Laravel (PHP 8.2) and Sanctum.
 
 ---
 
-## Live Demo
+## Live demo
 
-### API (Laravel)
-- **https://api.journal-index.org**
+API:
+https://api.journal-index.org
 
-Health check:
-- `GET /api/health` → `{ "ok": true }`
+Test:
+GET /api/health
+Result: { "ok": true }
 
-> The API is the core deliverable for this assessment.
+Frontend (Angular):
+https://journal-index.org/login
 
-### Optional Frontend (Angular)
-- **https://journal-index.org/login**
+Frontend is not required in task, I made it only to test API faster and to show UI.
 
-The frontend is **not part of the original assessment requirements**.  
-It is provided only to **visualize the features** and **test the API faster**.
-
-You can register using email + password, or use demo credentials:
-
-- **Email:** `demo@email.com`
-- **Password:** `123456789`
-
-> Demo data may be reset at any time.
+Demo login:
+email: demo@email.com
+password: 123456789
 
 ---
 
-## Tech Stack
+## Tech
 
-- PHP 8.2+
+- PHP 8.2
 - Laravel
-- Laravel Sanctum (API tokens)
-- SQLite (tests) / MySQL (local dev)
-- Queue: `sync` in tests, configurable for async workers
-- GitHub Actions CI (tests + coverage gate)
+- Sanctum
+- MySQL (local) / SQLite (tests)
+- Queue for notifications
+- Tests + GitHub Actions
+
+Test coverage is more than required (minimum was 70%).
 
 ---
 
-## Quality & Testing
+## Run local
 
--  **Layered architecture:** Controllers → Services → Repositories
--  **Design patterns used:** Repository + Observer (notifications on task changes)
--  **Caching:** task list endpoints (reduce repeated DB work)
--  **Rate limiting:** enabled for sensitive endpoints (auth)
--  **Standardized responses:** consistent `success/error/message/data` structure
--  **Automated tests:** unit + feature tests
--  **Coverage:** **above the required 70%** (coverage gate enforced via CI)  
-  *(If you confirmed 80%+, replace this line with “80%+ overall”.)*
-
----
-
-## Setup (Local)
-
-### 1) Install dependencies
-```bash
+1) install
 composer install
+
+2) env
+cp .env.example .env
+php artisan key:generate
+
+3) migrate
+php artisan migrate
+
+4) run
+php artisan serve
+
+---
+
+## Example (curl)
+
+Register:
+curl -X POST http://127.0.0.1:8000/api/register -H "Content-Type: application/json" -d "{\"name\":\"Test\",\"email\":\"test@test.com\",\"password\":\"12345678\"}"
+
+Login:
+curl -X POST http://127.0.0.1:8000/api/login -H "Content-Type: application/json" -d "{\"email\":\"test@test.com\",\"password\":\"12345678\"}"
+
+Use token:
+Authorization: Bearer YOUR_TOKEN
+
+---
+
+## Notes
+
+I used controllers + services + repositories to keep code clean.
+
+Notifications are created when task is updated (queue).
+Caching is used for task list.
+
+Thanks.
