@@ -15,11 +15,9 @@
         </testsuite>
     </testsuites>
 
-    <!-- Keep this empty tag to enable coverage feature,
-         but the actual include/exclude must be under <source> for newer PHPUnit -->
+
     <coverage />
 
-    <!-- THIS is what makes "coverage filter configured" and allows coverage gate to work -->
     <source>
         <include>
             <directory suffix=".php">app</directory>
@@ -33,17 +31,11 @@
     <php>
         <env name="APP_ENV" value="testing"/>
         <env name="APP_DEBUG" value="true"/>
-
-        <!-- Prevent MissingAppKeyException in CI even if key generation fails -->
         <env name="APP_KEY" value="base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="/>
-
-        <!-- Fast test defaults -->
         <env name="CACHE_STORE" value="array"/>
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="MAIL_MAILER" value="array"/>
         <env name="SESSION_DRIVER" value="array"/>
-
-        <!-- Stable DB for CI -->
         <env name="DB_CONNECTION" value="sqlite"/>
         <env name="DB_DATABASE" value=":memory:"/>
     </php>

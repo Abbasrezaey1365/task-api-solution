@@ -13,7 +13,7 @@ class AuthenticateMiddlewareTest extends TestCase
     {
         Route::get('/login', fn () => 'ok')->name('login');
 
-        /** @var Authenticate $middleware */
+
         $middleware = $this->app->make(Authenticate::class);
 
         $request = Request::create('/api/anything', 'GET');
@@ -26,7 +26,7 @@ class AuthenticateMiddlewareTest extends TestCase
     {
         Route::get('/login', fn () => 'ok')->name('login');
 
-        /** @var Authenticate $middleware */
+
         $middleware = $this->app->make(Authenticate::class);
 
         $request = Request::create('/anything', 'GET');

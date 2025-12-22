@@ -27,7 +27,6 @@ class TaskObserverTest extends TestCase
             'assigned_user_id' => null,
         ]);
 
-        // Change assignee -> should notify with TaskAssignedNotification
         $task->assigned_user_id = $assignee->id;
         $task->save();
 
@@ -47,7 +46,7 @@ class TaskObserverTest extends TestCase
             'status' => 'todo',
         ]);
 
-        // Change a watched field -> should notify with TaskUpdatedNotification
+
         $task->status = 'done';
         $task->save();
 
@@ -61,7 +60,7 @@ class TaskObserverTest extends TestCase
 
         $owner = User::factory()->create();
 
-        // assigned_user_id points to a non-existing user
+
         $task = Task::factory()->create([
             'user_id' => $owner->id,
             'assigned_user_id' => 999999,

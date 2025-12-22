@@ -13,8 +13,6 @@ class TaskFactory extends Factory
 
     public function definition(): array
     {
-        // If a user is authenticated (Sanctum::actingAs in tests),
-        // create the task under that user's ownership/project.
         $ownerId = auth()->id();
 
         if ($ownerId) {
@@ -34,7 +32,6 @@ class TaskFactory extends Factory
             ];
         }
 
-        // Fallback when no authenticated user exists
         $owner = User::factory()->create();
         $project = Project::factory()->create([
             'user_id' => $owner->id,

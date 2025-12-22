@@ -40,7 +40,6 @@ class CommentRepositoryTest extends TestCase
         Comment::query()->create(['task_id' => $task->id, 'user_id' => $user->id, 'body' => 'C1']);
         Comment::query()->create(['task_id' => $task->id, 'user_id' => $user->id, 'body' => 'C2']);
 
-        /** @var CommentRepository $repo */
         $repo = $this->app->make(CommentRepository::class);
 
         $page = $repo->paginateForUserTask($user->id, $task->id, 50);
@@ -60,7 +59,7 @@ class CommentRepositoryTest extends TestCase
             'body' => 'Hello',
         ]);
 
-        /** @var CommentRepository $repo */
+
         $repo = $this->app->make(CommentRepository::class);
 
         $found = $repo->findForUserOrFail($user->id, $comment->id);

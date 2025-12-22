@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/login', function () {
-    // tests only need the named route to exist
     return response()->json(['message' => 'login'], 200);
 })->name('login');
 

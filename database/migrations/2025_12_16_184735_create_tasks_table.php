@@ -12,19 +12,18 @@ return new class extends Migration {
 
             $table->foreignId('project_id')->constrained()->cascadeOnDelete();
 
-            // creator/owner (nullable because tests insert tasks directly without it)
+
             $table->foreignId('user_id')->nullable()->constrained('users')->nullOnDelete();
 
-            // assignee FK (nullable)
+
             $table->foreignId('assignee_id')->nullable()->constrained('users')->nullOnDelete();
 
-            // IMPORTANT: must NOT be FK (tests allow invalid id like 999999)
             $table->unsignedBigInteger('assigned_user_id')->nullable();
 
             $table->string('title');
             $table->text('description')->nullable();
 
-            $table->string('status')->default('todo'); // todo|doing|done
+            $table->string('status')->default('todo'); 
             $table->date('due_date')->nullable();
 
             $table->timestamps();

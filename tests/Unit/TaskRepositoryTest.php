@@ -41,7 +41,7 @@ class TaskRepositoryTest extends TestCase
             'due_date' => null,
         ]);
 
-        /** @var TaskRepository $repo */
+
         $repo = $this->app->make(TaskRepository::class);
 
         $result = $repo->paginateForUserProject(

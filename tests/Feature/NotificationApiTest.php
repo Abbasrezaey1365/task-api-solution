@@ -17,14 +17,14 @@ class NotificationApiTest extends TestCase
         $owner = User::factory()->create();
         $assignee = User::factory()->create();
 
-        // Owner creates project
+
         $project = Project::query()->create([
             'user_id' => $owner->id,
             'name' => 'P1',
             'description' => null,
         ]);
 
-        // Owner creates assigned task -> should trigger notification for assignee
+
         Sanctum::actingAs($owner);
 
         $this->postJson("/api/projects/{$project->id}/tasks", [
@@ -35,7 +35,7 @@ class NotificationApiTest extends TestCase
             'due_date' => now()->addDays(2)->toDateString(),
         ])->assertStatus(201);
 
-        // Assignee checks unseen
+
         Sanctum::actingAs($assignee);
 
         $unseen = $this->getJson('/api/notifications/unseen');
@@ -49,12 +49,12 @@ class NotificationApiTest extends TestCase
                 ],
             ]);
 
-        // Mark all as seen
+
         $this->postJson('/api/notifications/mark-all-seen')
             ->assertStatus(200)
             ->assertJsonPath('data.success', true);
 
-        // After marking, unseen should be empty
+
         $unseenAfter = $this->getJson('/api/notifications/unseen');
         $unseenAfter->assertStatus(200);
 

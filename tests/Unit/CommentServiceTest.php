@@ -37,7 +37,7 @@ class CommentServiceTest extends TestCase
         $user = User::factory()->create();
         $task = $this->makeTaskFor($user);
 
-        /** @var CommentService $service */
+
         $service = $this->app->make(CommentService::class);
 
         $created = $service->create($user->id, $task->id, [

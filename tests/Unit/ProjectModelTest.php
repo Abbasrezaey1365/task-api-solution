@@ -22,7 +22,6 @@ class ProjectModelTest extends TestCase
 
         $this->assertEquals('Test Project', $project->name);
 
-        // If you have relation like $project->user or $project->owner:
         if (method_exists($project, 'user')) {
             $this->assertEquals($user->id, $project->user->id);
         }

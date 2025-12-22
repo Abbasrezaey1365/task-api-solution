@@ -32,7 +32,7 @@ class TaskApiTest extends TestCase
         $list->assertStatus(200)
             ->assertJsonStructure([
                 'data' => [
-                    'data', // paginator items
+                    'data',
                     'current_page',
                     'per_page',
                     'total',

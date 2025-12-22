@@ -28,7 +28,6 @@ class TaskNotificationsTest extends TestCase
             'assignee_id' => $creator->id,
         ]);
 
-        // update assignee -> should trigger TaskAssignedNotification in observer
         $this->patchJson("/api/tasks/{$task->id}", [
             'assignee_id' => $assignee->id,
         ])->assertStatus(200);

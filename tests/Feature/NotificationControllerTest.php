@@ -16,7 +16,7 @@ class NotificationControllerTest extends TestCase
         $user = User::factory()->create();
         Sanctum::actingAs($user);
 
-        // create a database notification
+
         $n = $user->notifications()->create([
             'id' => \Illuminate\Support\Str::uuid()->toString(),
             'type' => 'App\\Notifications\\TaskAssignedNotification',
@@ -52,7 +52,7 @@ class NotificationControllerTest extends TestCase
         $res = $this->getJson("/api/notifications/unseen")
             ->assertStatus(200);
 
-        // adapt this assert to your response shape:
+
         $this->assertCount(1, $res->json('data.data'));
 
     }

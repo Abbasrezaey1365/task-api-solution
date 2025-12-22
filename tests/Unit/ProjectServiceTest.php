@@ -16,7 +16,7 @@ class ProjectServiceTest extends TestCase
     {
         $user = User::factory()->create();
 
-        /** @var ProjectService $service */
+
         $service = $this->app->make(ProjectService::class);
 
         $created = $service->create($user->id, [
@@ -44,7 +44,7 @@ class ProjectServiceTest extends TestCase
             'description' => null,
         ]);
 
-        /** @var ProjectService $service */
+
         $service = $this->app->make(ProjectService::class);
 
         $updated = $service->update($user->id, $project->id, [
