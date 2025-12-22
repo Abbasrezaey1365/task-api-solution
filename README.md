@@ -32,7 +32,7 @@ It is provided only to **visualize the features** and **test the API faster**.
 You can register using email + password, or use demo credentials:
 
 - **Email:** `demo@email.com`
-- **Password:** `12345`
+- **Password:** `123456789`
 
 > Demo data may be reset at any time.
 ---
