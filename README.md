@@ -27,7 +27,7 @@ https://journal-index.org/login
 
 Frontend is not required in task, I made it only to test API faster and to show UI.
 
-Demo login:
+You can register as here here https://journal-index.org/login or simply use premade demo user login:
 email: demo@email.com
 password: 123456789
 
