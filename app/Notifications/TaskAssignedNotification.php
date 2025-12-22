@@ -23,10 +23,8 @@ class TaskAssignedNotification extends Notification implements ShouldQueue
     public function toArray(object $notifiable): array
     {
         return [
-            'type' => 'task_assigned',
             'task_id' => $this->task->id,
-            'project_id' => $this->task->project_id,
-            'title' => $this->task->title,
+            'message' => 'You have been assigned a task: ' . $this->task->title,
         ];
     }
 }

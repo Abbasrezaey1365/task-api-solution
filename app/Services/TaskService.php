@@ -3,7 +3,6 @@
 namespace App\Services;
 
 use App\Models\Task;
-use App\Repositories\ProjectRepository;
 use App\Repositories\TaskRepository;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
@@ -11,48 +10,43 @@ use Illuminate\Support\Facades\Cache;
 class TaskService
 {
     public function __construct(
-        private readonly TaskRepository $tasks,
-        private readonly ProjectRepository $projects
+        private readonly TaskRepository $tasks
     ) {}
 
-    public function list(int $userId, int $projectId, array $filters, int $perPage): LengthAwarePaginator
+    public function list(int $userId, int $projectId, array $filters = [], int $perPage = 50): LengthAwarePaginator
     {
-        // ensure project belongs to user
-        $this->projects->findForUserOrFail($userId, $projectId);
-
         $versionKey = $this->versionKey($userId, $projectId);
+        $ver = (int) Cache::get($versionKey, 0);
 
-        // ✅ IMPORTANT: default must be 0, not 1
-        $version = (int) Cache::get($versionKey, 0);
+        $page = (int) request()->query('page', 1);
 
-        $cacheKey = 'tasks:list:' . $version . ':u' . $userId . ':p' . $projectId . ':' . md5(json_encode([
-            'filters' => $filters,
-            'perPage' => $perPage,
-            'page' => request()->query('page', 1),
-        ]));
+        $cacheKey = 'tasks:list:u' . $userId
+            . ':p' . $projectId
+            . ':v' . $ver
+            . ':pp' . $perPage
+            . ':pg' . $page
+            . ':f' . md5(json_encode($filters));
 
-        return Cache::remember($cacheKey, now()->addSeconds(60), function () use ($userId, $projectId, $filters, $perPage) {
-            return $this->tasks->paginateForUserProject($userId, $projectId, $filters, $perPage);
+        return Cache::remember($cacheKey, 60, function () use ($userId, $projectId, $filters, $perPage) {
+            return $this->tasks->paginateForUserProject(
+                userId: $userId,
+                projectId: $projectId,
+                filters: $filters,
+                perPage: $perPage
+            );
         });
     }
 
-    public function create(int $userId, int $projectId, array $data): Task
-    {
-        $this->projects->findForUserOrFail($userId, $projectId);
+public function create(int $userId, int $projectId, array $data): Task
+{
+    $data['user_id'] = $userId;
 
-        $task = $this->tasks->create([
-            'project_id' => $projectId,
-            'assigned_user_id' => $data['assigned_user_id'] ?? null,
-            'title' => $data['title'],
-            'description' => $data['description'] ?? null,
-            'status' => $data['status'] ?? 'todo',
-            'due_date' => $data['due_date'] ?? null,
-        ]);
+    $task = $this->tasks->create($projectId, $data);
 
-        $this->bumpVersion($userId, $projectId);
+    $this->bumpVersion($userId, $projectId);
 
-        return $task;
-    }
+    return $task;
+}
 
     public function get(int $userId, int $taskId): Task
     {
@@ -73,6 +67,7 @@ class TaskService
     public function delete(int $userId, int $taskId): void
     {
         $task = $this->tasks->findForUserOrFail($userId, $taskId);
+
         $projectId = $task->project_id;
 
         $this->tasks->delete($task);
@@ -89,9 +84,7 @@ class TaskService
     {
         $key = $this->versionKey($userId, $projectId);
 
-        // ✅ ensure key exists first (so increment always changes the number)
-        Cache::add($key, 0);
-
-        Cache::increment($key);
+        $current = (int) Cache::get($key, 0);
+        Cache::put($key, $current + 1);
     }
 }

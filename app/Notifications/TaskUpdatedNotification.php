@@ -4,10 +4,9 @@ namespace App\Notifications;
 
 use App\Models\Task;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
-class TaskUpdatedNotification extends Notification implements ShouldQueue
+class TaskUpdatedNotification extends Notification
 {
     use Queueable;
 
@@ -23,12 +22,8 @@ class TaskUpdatedNotification extends Notification implements ShouldQueue
     public function toArray(object $notifiable): array
     {
         return [
-            'type' => 'task_updated',
             'task_id' => $this->task->id,
-            'project_id' => $this->task->project_id,
-            'title' => $this->task->title,
-            'status' => $this->task->status,
-            'due_date' => optional($this->task->due_date)->toDateString(),
+            'message' => 'Task updated: ' . (string) $this->task->title,
         ];
     }
 }

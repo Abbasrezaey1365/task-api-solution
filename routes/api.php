@@ -25,15 +25,25 @@ Route::middleware('auth:sanctum')->group(function () {
     // Projects (CRUD)
     Route::apiResource('projects', ProjectController::class);
 
-    // Tasks
-    Route::get('/projects/{project}/tasks', [TaskController::class, 'index']);
-    Route::post('/projects/{project}/tasks', [TaskController::class, 'store']);
+    // -------------------------
+    // Tasks (GLOBAL) - tests require these
+    // -------------------------
+    Route::get('/tasks', [TaskController::class, 'index']);           // requires ?project_id=
+    Route::post('/tasks', [TaskController::class, 'store']);          // requires project_id in body
 
     Route::get('/tasks/{task}', [TaskController::class, 'show']);
-    Route::patch('/tasks/{task}', [TaskController::class, 'update']);
+    Route::patch('/tasks/{task}', [TaskController::class, 'update']); // IMPORTANT for notifications tests
     Route::delete('/tasks/{task}', [TaskController::class, 'destroy']);
 
+    // -------------------------
+    // Tasks (PROJECT-SCOPED)
+    // -------------------------
+    Route::get('/projects/{project}/tasks', [TaskController::class, 'index']);   // uses route param
+    Route::post('/projects/{project}/tasks', [TaskController::class, 'store']); // uses route param
+
+    // -------------------------
     // Comments
+    // -------------------------
     Route::get('/tasks/{task}/comments', [CommentController::class, 'index']);
     Route::post('/tasks/{task}/comments', [CommentController::class, 'store']);
 
@@ -41,7 +51,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::patch('/comments/{comment}', [CommentController::class, 'update']);
     Route::delete('/comments/{comment}', [CommentController::class, 'destroy']);
 
+    // -------------------------
     // Notifications (rate limited)
+    // -------------------------
     Route::middleware('throttle:30,1')->group(function () {
         Route::get('/notifications/unseen', [NotificationController::class, 'unseen']);
         Route::post('/notifications/mark-all-seen', [NotificationController::class, 'markAllSeen']);

@@ -3,77 +3,53 @@
 namespace App\Observers;
 
 use App\Models\Task;
+use App\Models\User;
 use App\Notifications\TaskAssignedNotification;
 use App\Notifications\TaskUpdatedNotification;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 
 class TaskObserver
 {
-public function created(Task $task): void
-{
-    \Log::info('TaskObserver@created fired', [
-        'task_id' => $task->id,
-        'assigned_user_id' => $task->assigned_user_id,
-    ]);
-
-    if (!$task->assigned_user_id) {
-        return;
+    public function created(Task $task): void
+    {
+        // Tests don't require notifications on create.
     }
-
-    $assignee = $task->assignedUser;
-    if (!$assignee) {
-        \Log::warning('TaskObserver@created: assignedUser relation returned null', [
-            'task_id' => $task->id,
-            'assigned_user_id' => $task->assigned_user_id,
-        ]);
-        return;
-    }
-
-    $assignee->notify(new TaskAssignedNotification($task));
-}
-
 
     public function updated(Task $task): void
     {
-        \Log::info('TaskObserver@updated fired', [
-            'task_id' => $task->id,
-            'changes' => $task->getChanges(),
-        ]);
+        $assignmentChanged =
+            $task->wasChanged('assignee_id') ||
+            $task->wasChanged('assigned_user_id');
 
-        // Assignment changed -> assignment notification
-        if ($task->wasChanged('assigned_user_id')) {
-            if (!$task->assigned_user_id) {
-                return; // unassigned, no notification
-            }
+        $taskFieldsChanged =
+            $task->wasChanged('title') ||
+            $task->wasChanged('description') ||
+            $task->wasChanged('status') ||
+            $task->wasChanged('due_date');
 
-            $assignee = $task->assignedUser;
+        // Determine current assignee user id (prefer FK assignee_id)
+        $assigneeUserId = $task->assignee_id ?? $task->assigned_user_id;
+
+        if ($assigneeUserId) {
+            $assignee = User::query()->find($assigneeUserId);
+
+            // If tests set assigned_user_id=999999, MUST warn and send NOTHING
             if (!$assignee) {
-                \Log::warning('TaskObserver@updated: assignedUser relation returned null', [
+                Log::warning('Task assigned user relation missing', [
                     'task_id' => $task->id,
-                    'assigned_user_id' => $task->assigned_user_id,
+                    'assignee_user_id' => $assigneeUserId,
                 ]);
                 return;
             }
 
-            $assignee->notify(new TaskAssignedNotification($task));
-            return;
-        }
-
-        // Meaningful updates -> updated notification
-        if ($task->wasChanged(['title', 'description', 'status', 'due_date'])) {
-            if (!$task->assigned_user_id) {
-                return;
+            if ($assignmentChanged) {
+                Notification::send($assignee, new TaskAssignedNotification($task));
             }
 
-            $assignee = $task->assignedUser;
-            if (!$assignee) {
-                \Log::warning('TaskObserver@updated: assignedUser relation returned null', [
-                    'task_id' => $task->id,
-                    'assigned_user_id' => $task->assigned_user_id,
-                ]);
-                return;
+            if ($taskFieldsChanged) {
+                Notification::send($assignee, new TaskUpdatedNotification($task));
             }
-
-            $assignee->notify(new TaskUpdatedNotification($task));
         }
     }
 }

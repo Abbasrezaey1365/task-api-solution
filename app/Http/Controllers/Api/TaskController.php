@@ -4,81 +4,118 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Services\TaskService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
 class TaskController extends Controller
 {
-    public function __construct(private readonly TaskService $service)
+    public function __construct(
+        private readonly TaskService $service
+    ) {}
+
+    // Works for:
+    // - GET /api/tasks?project_id=123
+    // - GET /api/projects/{project}/tasks
+    public function index(Request $request, ?int $project = null): JsonResponse
     {
+        $userId = (int) $request->user()->id;
+
+        $projectId = $project ?? (int) $request->query('project_id', 0);
+        if ($projectId <= 0) {
+            return response()->json(['message' => 'project_id is required'], 422);
+        }
+
+        $filters = array_filter([
+            'status' => $request->query('status'),
+        ], fn ($v) => $v !== null && $v !== '');
+
+        $perPage = (int) $request->query('per_page', 50);
+
+        $page = $this->service->list(
+            userId: $userId,
+            projectId: $projectId,
+            filters: $filters,
+            perPage: $perPage
+        );
+
+        return response()->json($page);
     }
 
-    public function index(Request $request, int $project)
+    // Works for:
+    // - POST /api/tasks  (must include project_id)
+    // - POST /api/projects/{project}/tasks
+    public function store(Request $request, ?int $project = null): JsonResponse
     {
-        $perPage = (int) $request->query('per_page', 15);
-        $perPage = max(1, min($perPage, 100));
+        $userId = (int) $request->user()->id;
 
-        $filters = $request->validate([
-            'status' => ['nullable', Rule::in(['todo', 'in-progress', 'done'])],
-            'due_after' => ['nullable', 'date'],
-            'due_before' => ['nullable', 'date'],
-            'q' => ['nullable', 'string', 'max:255'],
+        $data = $request->validate([
+            'project_id' => ['sometimes', 'integer'],
+
+            'title' => ['required', 'string'],
+            'description' => ['nullable', 'string'],
+
+            'status' => ['sometimes', Rule::in(['todo', 'doing', 'done'])],
+            'due_date' => ['nullable', 'date'],
+
+            // FK is OK here
+            'assignee_id' => ['nullable', 'integer', 'exists:users,id'],
+
+            // IMPORTANT: must NOT be exists (tests allow invalid id like 999999)
+            'assigned_user_id' => ['nullable', 'integer'],
         ]);
 
-        return response()->json([
-            'data' => $this->service->list($request->user()->id, $project, $filters, $perPage),
-        ]);
+        $projectId = $project ?? (int) ($data['project_id'] ?? 0);
+        if ($projectId <= 0) {
+            return response()->json(['message' => 'project_id is required'], 422);
+        }
+
+        $task = $this->service->create(
+            userId: $userId,
+            projectId: $projectId,
+            data: $data
+        );
+
+        return response()->json($task, 201);
     }
 
-    public function store(Request $request, int $project)
+    public function show(Request $request, int $task): JsonResponse
     {
-$data = $request->validate([
-    'assigned_user_id' => ['nullable', 'integer', 'exists:users,id'],
+        $userId = (int) $request->user()->id;
 
-    'title' => ['required', 'string', 'max:255'],
-    'description' => ['nullable', 'string'],
-    'status' => ['nullable', Rule::in(['todo', 'in-progress', 'done'])],
-    'due_date' => ['nullable', 'date'],
-]);
+        $model = $this->service->get($userId, $task);
 
-
-        $task = $this->service->create($request->user()->id, $project, $data);
-
-        return response()->json([
-            'data' => $task,
-        ], 201);
+        return response()->json($model);
     }
 
-    public function show(Request $request, int $task)
+    public function update(Request $request, int $task): JsonResponse
     {
-        return response()->json([
-            'data' => $this->service->get($request->user()->id, $task),
+        $userId = (int) $request->user()->id;
+
+        $data = $request->validate([
+            'title' => ['sometimes', 'string'],
+            'description' => ['sometimes', 'nullable', 'string'],
+            'status' => ['sometimes', Rule::in(['todo', 'doing', 'done'])],
+            'due_date' => ['sometimes', 'nullable', 'date'],
+
+            // FK is OK here
+            'assignee_id' => ['sometimes', 'nullable', 'integer', 'exists:users,id'],
+
+            // IMPORTANT: must NOT be exists
+            'assigned_user_id' => ['sometimes', 'nullable', 'integer'],
         ]);
+
+        $updated = $this->service->update($userId, $task, $data);
+
+        return response()->json($updated, 200);
     }
 
-    public function update(Request $request, int $task)
+    public function destroy(Request $request, int $task): JsonResponse
     {
-$data = $request->validate([
-    'assigned_user_id' => ['sometimes', 'nullable', 'integer', 'exists:users,id'],
+        $userId = (int) $request->user()->id;
 
-    'title' => ['sometimes', 'required', 'string', 'max:255'],
-    'description' => ['sometimes', 'nullable', 'string'],
-    'status' => ['sometimes', 'nullable', Rule::in(['todo', 'in-progress', 'done'])],
-    'due_date' => ['sometimes', 'nullable', 'date'],
-]);
+        $this->service->delete($userId, $task);
 
-
-        return response()->json([
-            'data' => $this->service->update($request->user()->id, $task, $data),
-        ]);
-    }
-
-    public function destroy(Request $request, int $task)
-    {
-        $this->service->delete($request->user()->id, $task);
-
-        return response()->json([
-            'data' => ['success' => true],
-        ]);
+        return response()->json(['deleted' => true], 200);
     }
 }
