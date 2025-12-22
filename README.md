@@ -2,14 +2,34 @@
 
 Senior PHP Backend Developer – Coding Assessment solution.
 
-This project provides a REST API for managing:
+A REST API for collaborative task management:
 - Users (Auth)
 - Projects (owned by user)
 - Tasks (CRUD + filtering + pagination)
 - Comments (CRUD per task)
-- Notifications (triggered on task changes, delivered async)
+- Notifications (triggered on task changes)
 
 Built with **Laravel (PHP 8.2+)**, **Sanctum** for API authentication, layered architecture (Controllers → Services → Repositories), caching for task listings, standardized API responses, and automated tests.
+
+---
+
+## Live Demo
+
+### Frontend (Angular)
+- **https://journal-index.org/login**
+
+You can **register** using email + password, or use demo credentials:
+
+- **Email:** `demo@email.com`  
+- **Password:** `12345`
+
+### API (Laravel)
+- **https://api.journal-index.org**
+
+Health check example:
+- `GET /api/health` → `{ "ok": true }` *(if you have it)*
+
+> Demo data may be reset at any time.
 
 ---
 
